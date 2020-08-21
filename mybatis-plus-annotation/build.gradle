@@ -1,3 +1,4 @@
 dependencies {
     implementation "${lib.mybatis}"
+    api "${lib.jpa}"
 }
