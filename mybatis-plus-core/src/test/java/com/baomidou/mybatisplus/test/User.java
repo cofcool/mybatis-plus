@@ -15,11 +15,11 @@
  */
 package com.baomidou.mybatisplus.test;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import javax.persistence.Column;
+import javax.persistence.Table;
 import lombok.Data;
 
-@TableName("sys_user")
+@Table(name = "sys_user")
 @Data
 public class User {
 

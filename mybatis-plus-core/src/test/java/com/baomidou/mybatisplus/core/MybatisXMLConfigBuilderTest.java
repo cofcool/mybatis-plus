@@ -1,17 +1,16 @@
 package com.baomidou.mybatisplus.core;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import java.io.IOException;
+import javax.persistence.Table;
 import lombok.Data;
 import org.apache.ibatis.session.Configuration;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-
-import java.io.IOException;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author miemie
@@ -35,7 +34,7 @@ class MybatisXMLConfigBuilderTest {
     }
 
     @Data
-    @TableName(autoResultMap = true)
+    @Table
     static class Entity {
         private Long id;
         private String name;

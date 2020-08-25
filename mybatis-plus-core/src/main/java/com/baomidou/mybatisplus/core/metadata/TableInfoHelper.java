@@ -20,7 +20,6 @@ import static java.util.stream.Collectors.toList;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
@@ -40,6 +39,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.persistence.Column;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.builder.StaticSqlSource;
@@ -187,7 +187,7 @@ public class TableInfoHelper {
     private static String[] initTableName(Class<?> clazz, GlobalConfig globalConfig, TableInfo tableInfo) {
         /* 数据库全局配置 */
         GlobalConfig.DbConfig dbConfig = globalConfig.getDbConfig();
-        TableName table = clazz.getAnnotation(TableName.class);
+        Table table = clazz.getAnnotation(Table.class);
 
         String tableName = clazz.getSimpleName();
         String tablePrefix = dbConfig.getTablePrefix();
@@ -196,23 +196,23 @@ public class TableInfoHelper {
         String[] excludeProperty = null;
 
         if (table != null) {
-            if (StringUtils.isNotBlank(table.value())) {
-                tableName = table.value();
-                if (StringUtils.isNotBlank(tablePrefix) && !table.keepGlobalPrefix()) {
-                    tablePrefixEffect = false;
-                }
+            if (StringUtils.isNotBlank(table.name())) {
+                tableName = table.name();
+//                if (StringUtils.isNotBlank(tablePrefix) && !table.keepGlobalPrefix()) {
+//                    tablePrefixEffect = false;
+//                }
             } else {
                 tableName = initTableNameWithDbConfig(tableName, dbConfig);
             }
             if (StringUtils.isNotBlank(table.schema())) {
                 schema = table.schema();
             }
-            /* 表结果集映射 */
-            if (StringUtils.isNotBlank(table.resultMap())) {
-                tableInfo.setResultMap(table.resultMap());
-            }
-            tableInfo.setAutoInitResultMap(table.autoResultMap());
-            excludeProperty = table.excludeProperty();
+//            /* 表结果集映射 */
+//            if (StringUtils.isNotBlank(table.resultMap())) {
+//                tableInfo.setResultMap(table.resultMap());
+//            }
+//            tableInfo.setAutoInitResultMap(table.autoResultMap());
+//            excludeProperty = table.excludeProperty();
         } else {
             tableName = initTableNameWithDbConfig(tableName, dbConfig);
         }

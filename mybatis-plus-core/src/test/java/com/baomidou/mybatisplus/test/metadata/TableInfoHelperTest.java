@@ -3,7 +3,6 @@ package com.baomidou.mybatisplus.test.metadata;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
@@ -16,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
@@ -52,7 +52,7 @@ class TableInfoHelperTest {
 
     @Data
     @EqualsAndHashCode(callSuper = true)
-    @TableName(excludeProperty = "test")
+    @Table
     private static class ModelThree extends BaseModel {
 
         private String sex;
@@ -62,7 +62,7 @@ class TableInfoHelperTest {
 
     @Data
     @EqualsAndHashCode(callSuper = true)
-    @TableName(excludeProperty = {"test", "id"})
+    @Table
     private static class ModelFour extends BaseModel {
 
         private String sex;
@@ -77,18 +77,6 @@ class TableInfoHelperTest {
         assertThat(TableInfoHelper.isExistTableId(Arrays.asList(ModelTwo.class.getDeclaredFields()))).isFalse();
     }
 
-    @Test
-    void testExcludeProperty() {
-        TableInfo tableInfo = TableInfoHelper.initTableInfo(new MapperBuilderAssistant(new MybatisConfiguration(), ""), ModelThree.class);
-        assertThat(tableInfo.havePK()).isTrue();
-        assertThat(tableInfo.getKeyProperty()).isEqualTo("id");
-        assertThat(tableInfo.getFieldList().size()).isEqualTo(2);
-        assertThat(tableInfo.getFieldList()).noneMatch(i -> i.getProperty().equals("test"));
-
-        tableInfo = TableInfoHelper.initTableInfo(new MapperBuilderAssistant(new MybatisConfiguration(), ""), ModelFour.class);
-        assertThat(tableInfo.getFieldList().size()).isEqualTo(2);
-        assertThat(tableInfo.getFieldList()).noneMatch(i -> i.getProperty().equals("test"));
-    }
 
     @Test
     void testMoreTableId() {
