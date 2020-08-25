@@ -15,8 +15,8 @@
  */
 package com.baomidou.mybatisplus.test;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 
+import javax.persistence.Column;
 import lombok.Data;
 
 @Data
@@ -24,6 +24,6 @@ public class Role {
 
     private Integer id;
 
-    @TableField("roleName")
+    @Column(name = "roleName")
     private String name;
 }

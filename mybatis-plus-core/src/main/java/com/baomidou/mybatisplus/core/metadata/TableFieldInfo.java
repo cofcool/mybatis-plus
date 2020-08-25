@@ -15,19 +15,30 @@
  */
 package com.baomidou.mybatisplus.core.metadata;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.SqlCondition;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
-import lombok.*;
+import java.lang.reflect.Field;
+import java.util.Map;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.apache.ibatis.mapping.ResultMapping;
 import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.type.*;
-
-import java.lang.reflect.Field;
-import java.util.Map;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.TypeAliasRegistry;
+import org.apache.ibatis.type.TypeHandler;
+import org.apache.ibatis.type.TypeHandlerRegistry;
+import org.apache.ibatis.type.UnknownTypeHandler;
 
 /**
  * 数据库表字段反射信息
@@ -160,7 +171,7 @@ public class TableFieldInfo implements Constants {
      * 全新的 存在 TableField 注解时使用的构造函数
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public TableFieldInfo(GlobalConfig.DbConfig dbConfig, TableInfo tableInfo, Field field, TableField tableField,
+    public TableFieldInfo(GlobalConfig.DbConfig dbConfig, TableInfo tableInfo, Field field, TableColumnInfo columnInfo,
                           Reflector reflector, boolean existTableLogic) {
         field.setAccessible(true);
         this.field = field;
@@ -169,13 +180,13 @@ public class TableFieldInfo implements Constants {
         this.propertyType = reflector.getGetterType(this.property);
         this.isPrimitive = this.propertyType.isPrimitive();
         this.isCharSequence = StringUtils.isCharSequence(this.propertyType);
-        this.fieldFill = tableField.fill();
+        this.fieldFill = columnInfo.fill();
         this.withInsertFill = this.fieldFill == FieldFill.INSERT || this.fieldFill == FieldFill.INSERT_UPDATE;
         this.withUpdateFill = this.fieldFill == FieldFill.UPDATE || this.fieldFill == FieldFill.INSERT_UPDATE;
-        this.update = tableField.update();
-        JdbcType jdbcType = tableField.jdbcType();
-        final Class<? extends TypeHandler> typeHandler = tableField.typeHandler();
-        final String numericScale = tableField.numericScale();
+        this.update = columnInfo.update();
+        JdbcType jdbcType = columnInfo.jdbcType();
+        final Class<? extends TypeHandler> typeHandler = columnInfo.typeHandler();
+        final String numericScale = columnInfo.numericScale();
         String el = this.property;
         if (JdbcType.UNDEFINED != jdbcType) {
             this.jdbcType = jdbcType;
@@ -183,7 +194,7 @@ public class TableFieldInfo implements Constants {
         }
         if (UnknownTypeHandler.class != typeHandler) {
             this.typeHandler = (Class<? extends TypeHandler<?>>) typeHandler;
-            if (tableField.javaType()) {
+            if (columnInfo.javaType()) {
                 String javaType = null;
                 TypeAliasRegistry registry = tableInfo.getConfiguration().getTypeAliasRegistry();
                 Map<String, Class<?>> typeAliases = registry.getTypeAliases();
@@ -207,7 +218,7 @@ public class TableFieldInfo implements Constants {
         this.el = el;
         this.initLogicDelete(dbConfig, field, existTableLogic);
 
-        String column = tableField.value();
+        String column = columnInfo.getColumnName();
         if (StringUtils.isBlank(column)) {
             column = this.property;
             if (tableInfo.isUnderCamel()) {
@@ -220,7 +231,7 @@ public class TableFieldInfo implements Constants {
             }
         }
         String columnFormat = dbConfig.getColumnFormat();
-        if (StringUtils.isNotBlank(columnFormat) && tableField.keepGlobalFormat()) {
+        if (StringUtils.isNotBlank(columnFormat) && columnInfo.keepGlobalFormat()) {
             column = String.format(columnFormat, column);
         }
 
@@ -237,17 +248,17 @@ public class TableFieldInfo implements Constants {
             this.sqlSelect += (" AS " + asProperty);
         }
 
-        this.insertStrategy = this.chooseFieldStrategy(tableField.insertStrategy(), dbConfig.getInsertStrategy());
-        this.updateStrategy = this.chooseFieldStrategy(tableField.updateStrategy(), dbConfig.getUpdateStrategy());
-        this.whereStrategy = this.chooseFieldStrategy(tableField.whereStrategy(), dbConfig.getSelectStrategy());
+        this.insertStrategy = this.chooseFieldStrategy(columnInfo.insertStrategy(), dbConfig.getInsertStrategy());
+        this.updateStrategy = this.chooseFieldStrategy(columnInfo.updateStrategy(), dbConfig.getUpdateStrategy());
+        this.whereStrategy = this.chooseFieldStrategy(columnInfo.whereStrategy(), dbConfig.getSelectStrategy());
 
-        if (StringUtils.isNotBlank(tableField.condition())) {
+        if (StringUtils.isNotBlank(columnInfo.condition())) {
             // 细粒度条件控制
-            this.condition = tableField.condition();
+            this.condition = columnInfo.condition();
         }
 
         // 字段是否注入查询
-        this.select = tableField.select();
+        this.select = columnInfo.select();
     }
 
     /**

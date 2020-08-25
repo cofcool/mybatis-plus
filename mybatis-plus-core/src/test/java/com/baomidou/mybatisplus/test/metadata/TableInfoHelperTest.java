@@ -1,6 +1,7 @@
 package com.baomidou.mybatisplus.test.metadata;
 
-import com.baomidou.mybatisplus.annotation.TableId;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
@@ -11,17 +12,15 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.Id;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class TableInfoHelperTest {
 
@@ -37,7 +36,7 @@ class TableInfoHelperTest {
     @Data
     private static class ModelOne {
 
-        @TableId
+        @Id
         private Long id;
 
         private String name;
@@ -154,17 +153,17 @@ class TableInfoHelperTest {
     @Data
     private static class ModelFive {
 
-        @TableId
+        @Id
         private String id1;
 
-        @TableId
+        @Id
         private String id2;
     }
 
     @Data
     private static class ModelSex {
 
-        @TableId
+        @Id
         private String realId;
     }
 

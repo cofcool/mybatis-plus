@@ -1,9 +1,12 @@
 package com.baomidou.mybatisplus.core.handlers;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import javax.persistence.Column;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -11,11 +14,6 @@ import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.reflection.MetaObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author miemie
@@ -144,15 +142,15 @@ class MetaObjectHandlerTest {
     static class Xt {
         private Long id;
 
-        @TableField(fill = FieldFill.INSERT_UPDATE)
+        @Column
         private String name;
-        @TableField(fill = FieldFill.INSERT_UPDATE)
+        @Column
         private Integer age;
-        @TableField(fill = FieldFill.INSERT_UPDATE)
+        @Column
         private LocalDate birthday;
-        @TableField(fill = FieldFill.INSERT_UPDATE)
+        @Column
         private LocalDateTime dateTime;
-        @TableField(fill = FieldFill.INSERT_UPDATE)
+        @Column
         private Ojbk ojbk;
     }
 

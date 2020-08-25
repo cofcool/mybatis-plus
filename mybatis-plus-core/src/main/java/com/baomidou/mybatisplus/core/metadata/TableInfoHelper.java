@@ -15,10 +15,32 @@
  */
 package com.baomidou.mybatisplus.core.metadata;
 
-import com.baomidou.mybatisplus.annotation.*;
+import static java.util.stream.Collectors.toList;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
-import com.baomidou.mybatisplus.core.toolkit.*;
+import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
+import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
+import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
+import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
+import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Transient;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.executor.keygen.KeyGenerator;
@@ -32,18 +54,13 @@ import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.reflection.ReflectorFactory;
 import org.apache.ibatis.session.Configuration;
 
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static java.util.stream.Collectors.toList;
-
 /**
  * <p>
  * 实体类反射表辅助类
  * </p>
  *
  * @author hubin sjy
+ * @author CofCool
  * @since 2016-09-09
  */
 public class TableInfoHelper {
@@ -269,14 +286,15 @@ public class TableInfoHelper {
                 continue;
             }
 
+            TableColumnInfo columnInfo = TableColumnInfo.from(field);
+
             /* 主键ID 初始化 */
             if (existTableId) {
-                TableId tableId = field.getAnnotation(TableId.class);
-                if (tableId != null) {
+                if (columnInfo.isPrimaryKey()) {
                     if (isReadPK) {
-                        throw ExceptionUtils.mpe("@TableId can't more than one in Class: \"%s\".", clazz.getName());
+                        throw ExceptionUtils.mpe("@Id can't more than one in Class: \"%s\".", clazz.getName());
                     } else {
-                        initTableIdWithAnnotation(dbConfig, tableInfo, field, tableId, reflector);
+                        initTableIdWithAnnotation(dbConfig, tableInfo, field, columnInfo, reflector);
                         isReadPK = true;
                         continue;
                     }
@@ -287,11 +305,11 @@ public class TableInfoHelper {
                     continue;
                 }
             }
-            final TableField tableField = field.getAnnotation(TableField.class);
+            final Column tableField = field.getAnnotation(Column.class);
 
-            /* 有 @TableField 注解的字段初始化 */
+            /* 有 @Column 注解的字段初始化 */
             if (tableField != null) {
-                fieldList.add(new TableFieldInfo(dbConfig, tableInfo, field, tableField, reflector, existTableLogic));
+                fieldList.add(new TableFieldInfo(dbConfig, tableInfo, field, columnInfo, reflector, existTableLogic));
                 continue;
             }
 
@@ -317,7 +335,7 @@ public class TableInfoHelper {
      * @return true 为存在 @TableId 注解;
      */
     public static boolean isExistTableId(List<Field> list) {
-        return list.stream().anyMatch(field -> field.isAnnotationPresent(TableId.class));
+        return list.stream().anyMatch(field -> field.isAnnotationPresent(Id.class));
     }
 
     /**
@@ -337,32 +355,30 @@ public class TableInfoHelper {
      * 主键属性初始化
      * </p>
      *
-     * @param dbConfig  全局配置信息
-     * @param tableInfo 表信息
-     * @param field     字段
-     * @param tableId   注解
-     * @param reflector Reflector
+     * @param dbConfig   全局配置信息
+     * @param tableInfo  表信息
+     * @param field      字段
+     * @param columnInfo 字段元信息
+     * @param reflector  Reflector
      */
     private static void initTableIdWithAnnotation(GlobalConfig.DbConfig dbConfig, TableInfo tableInfo,
-                                                  Field field, TableId tableId, Reflector reflector) {
+                                                  Field field, TableColumnInfo columnInfo, Reflector reflector) {
         boolean underCamel = tableInfo.isUnderCamel();
         final String property = field.getName();
-        if (field.getAnnotation(TableField.class) != null) {
-            logger.warn(String.format("This \"%s\" is the table primary key by @TableId annotation in Class: \"%s\",So @TableField annotation will not work!",
-                property, tableInfo.getEntityType().getName()));
-        }
+
         /* 主键策略（ 注解 > 全局 ） */
         // 设置 Sequence 其他策略无效
-        if (IdType.NONE == tableId.type()) {
+        IdType idType = columnInfo.getIdType();
+        if (IdType.NONE == idType) {
             tableInfo.setIdType(dbConfig.getIdType());
         } else {
-            tableInfo.setIdType(tableId.type());
+            tableInfo.setIdType(idType);
         }
 
         /* 字段 */
         String column = property;
-        if (StringUtils.isNotBlank(tableId.value())) {
-            column = tableId.value();
+        if (StringUtils.isNotBlank(columnInfo.getColumnName())) {
+            column = columnInfo.getColumnName();
         } else {
             // 开启字段下划线申明
             if (underCamel) {
@@ -398,10 +414,6 @@ public class TableInfoHelper {
                                                         Field field, Reflector reflector) {
         final String property = field.getName();
         if (DEFAULT_ID_NAME.equalsIgnoreCase(property)) {
-            if (field.getAnnotation(TableField.class) != null) {
-                logger.warn(String.format("This \"%s\" is the table primary key by default name for `id` in Class: \"%s\",So @TableField will not work!",
-                    property, tableInfo.getEntityType().getName()));
-            }
             String column = property;
             if (dbConfig.isCapitalMode()) {
                 column = column.toUpperCase();
@@ -456,11 +468,9 @@ public class TableInfoHelper {
     public static List<Field> getAllFields(Class<?> clazz) {
         List<Field> fieldList = ReflectionKit.getFieldList(ClassUtils.getUserClass(clazz));
         return fieldList.stream()
-            .filter(field -> {
-                /* 过滤注解非表字段属性 */
-                TableField tableField = field.getAnnotation(TableField.class);
-                return (tableField == null || tableField.exist());
-            }).collect(toList());
+            // 过滤非表字段
+            .filter(field -> field.getAnnotation(Transient.class) == null)
+            .collect(toList());
     }
 
     public static KeyGenerator genKeyGenerator(String baseStatementId, TableInfo tableInfo, MapperBuilderAssistant builderAssistant) {

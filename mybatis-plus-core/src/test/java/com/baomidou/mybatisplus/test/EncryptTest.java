@@ -15,14 +15,12 @@
  */
 package com.baomidou.mybatisplus.test;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.EncryptUtils;
+import javax.persistence.Column;
 import lombok.Data;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.jupiter.api.Assertions;
@@ -62,15 +60,15 @@ class EncryptTest {
     @Data
     private static class Xx {
         private Long id;
-        @TableField(fill = FieldFill.INSERT)
+        @Column
         private String x1;
-        @TableField(fill = FieldFill.INSERT_UPDATE, whereStrategy = FieldStrategy.NOT_EMPTY)
+        @Column
         private String x2;
-        @TableField(fill = FieldFill.UPDATE)
+        @Column
         private String x3;
-        @TableField(whereStrategy = FieldStrategy.NOT_EMPTY)
+        @Column
         private String x4;
-        @TableField(value = "xx5", updateStrategy = FieldStrategy.IGNORED, update = "%s+1")
+        @Column
         private String x5;
         @TableLogic
         private Integer deleted;
