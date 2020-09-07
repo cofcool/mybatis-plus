@@ -26,6 +26,8 @@
 
 MyBatis-Plus is an powerful enhanced toolkit of MyBatis for simplify development. This toolkit provides some efficient, useful, out-of-the-box features for MyBatis, use it can effectively save your development time.
 
+**⚠️Note**: Mybatis Dynamic SQL is better than MyBatis-Plus for JPA, so give up this project.
+
 ## Links
 
 -   [Documentation](https://mybatis.plus)
