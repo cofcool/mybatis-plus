@@ -15,16 +15,16 @@
  */
 package com.baomidou.mybatisplus.generator.config.po;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.IntStream;
-
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
-
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.IntStream;
+import javax.persistence.Column;
+import javax.persistence.Id;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -103,7 +103,7 @@ public class TableInfo {
                 if (field.isKeyFlag()) {
                     // 主键
                     if (field.isConvert() || field.isKeyIdentityFlag()) {
-                        importPackages.add(com.baomidou.mybatisplus.annotation.TableId.class.getCanonicalName());
+                        importPackages.add(Id.class.getCanonicalName());
                     }
                     // 自增
                     if (field.isKeyIdentityFlag()) {
@@ -111,11 +111,11 @@ public class TableInfo {
                     }
                 } else if (field.isConvert()) {
                     // 普通字段
-                    importPackages.add(com.baomidou.mybatisplus.annotation.TableField.class.getCanonicalName());
+                    importPackages.add(Column.class.getCanonicalName());
                 }
                 if (null != field.getFill()) {
                     // 填充字段
-                    importPackages.add(com.baomidou.mybatisplus.annotation.TableField.class.getCanonicalName());
+                    importPackages.add(Column.class.getCanonicalName());
                     importPackages.add(com.baomidou.mybatisplus.annotation.FieldFill.class.getCanonicalName());
                 }
             }

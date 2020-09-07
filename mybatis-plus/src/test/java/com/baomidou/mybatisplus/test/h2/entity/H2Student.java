@@ -15,13 +15,11 @@
  */
 package com.baomidou.mybatisplus.test.h2.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-
 import com.baomidou.mybatisplus.test.h2.enums.GenderEnum;
 import com.baomidou.mybatisplus.test.h2.enums.GradeEnum;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,7 +33,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-@TableName("h2student")
+@Table(name = "h2student")
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -53,7 +51,7 @@ public class H2Student extends Model<H2Student> {
         this.age = age;
     }
 
-    @TableId(type = IdType.AUTO)
+    @Id
     private Long id;
 
     private String name;

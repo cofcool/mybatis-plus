@@ -15,14 +15,16 @@
  */
 package com.baomidou.mybatisplus.test.h2.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.test.h2.enums.AgeEnum;
+import java.math.BigDecimal;
+import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-
-import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 测试用户类
@@ -32,7 +34,7 @@ import java.util.Date;
 /* 表名 value 注解【 驼峰命名可无 】, resultMap 注解测试【 映射 xml 的 resultMap 内容 】 */
 @Data
 @Accessors(chain = true)
-@TableName("h2user")
+@Table(name = "h2user")
 @EqualsAndHashCode(callSuper = true)
 public class H2User extends SuperEntity {
 
@@ -50,19 +52,19 @@ public class H2User extends SuperEntity {
     private BigDecimal price;
 
     /* 测试下划线字段命名类型, 字段填充 */
-    @TableField
+    @Column
     private Integer testType;
 
     /**
      * 转义关键字测试
      */
-    @TableField("`desc`")
+    @Column(name = "`desc`")
     private String desc;
 
     /**
      * 该注解 select 默认不注入 select 查询
      */
-    @TableField(select = false)
+    @Column
     private Date testDate;
 
     @Version

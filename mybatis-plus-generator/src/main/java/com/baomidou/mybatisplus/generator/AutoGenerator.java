@@ -15,19 +15,27 @@
  */
 package com.baomidou.mybatisplus.generator;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.baomidou.mybatisplus.generator.config.*;
+import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
+import com.baomidou.mybatisplus.generator.config.GlobalConfig;
+import com.baomidou.mybatisplus.generator.config.PackageConfig;
+import com.baomidou.mybatisplus.generator.config.StrategyConfig;
+import com.baomidou.mybatisplus.generator.config.TemplateConfig;
 import com.baomidou.mybatisplus.generator.config.builder.ConfigBuilder;
 import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.engine.AbstractTemplateEngine;
 import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
+import java.io.Serializable;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -35,10 +43,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 生成文件
@@ -143,7 +147,7 @@ public class AutoGenerator {
             }
             if (tableInfo.isConvert()) {
                 // 表注解
-                tableInfo.setImportPackages(TableName.class.getCanonicalName());
+                tableInfo.setImportPackages(Table.class.getCanonicalName());
             }
             if (config.getStrategyConfig().getLogicDeleteFieldName() != null && tableInfo.isLogicDelete(config.getStrategyConfig().getLogicDeleteFieldName())) {
                 // 逻辑删除注解
@@ -173,9 +177,9 @@ public class AutoGenerator {
                 tableFields.forEach(field -> {
                     //主键为is的情况基本上是不存在的.
                     if (field.isKeyFlag()) {
-                        tableInfo.setImportPackages(TableId.class.getCanonicalName());
+                        tableInfo.setImportPackages(Id.class.getCanonicalName());
                     } else {
-                        tableInfo.setImportPackages(com.baomidou.mybatisplus.annotation.TableField.class.getCanonicalName());
+                        tableInfo.setImportPackages(Column.class.getCanonicalName());
                     }
                     field.setConvert(true);
                     field.setPropertyName(StringUtils.removePrefixAfterPrefixToLower(field.getPropertyName(), 2));

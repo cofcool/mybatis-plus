@@ -1,17 +1,19 @@
 package com.baomidou.mybatisplus.test.h2.idgenerator.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@TableName(value = "t_id_generator_string")
+@Table(name = "t_id_generator_string")
 public class StringIdGeneratorModel {
 
-    @TableId(type = IdType.UUID)
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private String id;
 
     private String name;

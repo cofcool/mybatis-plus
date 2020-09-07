@@ -15,15 +15,17 @@
  */
 package com.baomidou.mybatisplus.test.h2.keygenerator.model;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.KeySequence;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import lombok.Data;
 
 @Data
-@TableName(value = "key_generator_model")
+@Table(name = "key_generator_model")
 @KeySequence(value = "key_generator_model_seq")
 public class LongKeyGeneratorModel {
 
-    @TableId(type = IdType.INPUT)
+    @Id
     private Long id;
 
     private String name;

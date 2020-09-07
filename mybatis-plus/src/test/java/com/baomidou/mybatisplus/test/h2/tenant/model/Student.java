@@ -1,16 +1,15 @@
 package com.baomidou.mybatisplus.test.h2.tenant.model;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import java.io.Serializable;
+import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 
 /**
  * @author nieqiuqiu 2019/12/8
  */
 @Data
-@TableName(value = "student")
+@Table(name = "student")
 @NoArgsConstructor
 public class Student implements Serializable {
 

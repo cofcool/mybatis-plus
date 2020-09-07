@@ -15,17 +15,16 @@
  */
 package com.baomidou.mybatisplus.test.h2.cache.model;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import java.io.Serializable;
+import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName(value = "t_cache")
+@Table(name = "t_cache")
 public class CacheModel implements Serializable {
 
     private Long id;

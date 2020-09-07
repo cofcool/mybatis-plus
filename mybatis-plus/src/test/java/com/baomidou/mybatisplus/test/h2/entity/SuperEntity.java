@@ -15,12 +15,11 @@
  */
 package com.baomidou.mybatisplus.test.h2.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
+import java.io.Serializable;
+import javax.persistence.Id;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-
-import java.io.Serializable;
 
 /**
  * 测试父类情况
@@ -37,9 +36,9 @@ public class SuperEntity extends SuSuperEntity implements Serializable {
 	 *  serialVersionUID
 	 */
 	private static final long serialVersionUID = -3111558058262086115L;
-	
+
 	/* 主键ID 注解，value 字段名，type 用户输入ID */
-    @TableId
+    @Id
     private Long testId;
 
 }
